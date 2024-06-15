@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortune Wheel Fun</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://i.ibb.co/ySjqrHx/background-clean.png');
+            /* Add your background image URL here */
+            background-size: cover;
+            background-position: center;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #fff;
+            text-align: center;
+        }
+
+        #wheel {
+            width: 500px;
+            height: 500px;
+            border: 20px solid #682811;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        #wheel canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        #pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid red;
+            position: absolute;
+            top: -40px;
+            left: calc(50% - 20px);
+        }
+
+        #indicator {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: red;
+        }
+
+        #spinButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+        /* Person image styling */
+        #personImage {
+            position: absolute;
+            /* top: 0px; */
+            /* left: 0px; */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            background-image: url(https://i.ibb.co/SQkFJYN/jerry.png);
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            z-index: 1;
+        }
+
+        /* Popup styling */
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        #popup h2 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #FFD700;
+        }
+
+        #popup img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        #popup .audio-container {
+            position: relative;
+        }
+
+        #popup .audio-container button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 215, 0, 0.8);
+            border: none;
+            border-radius: 50%;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #popup .close {
+            display: block;
+            text-align: right;
+            margin-top: 10px;
+            color: #000;
+            text-decoration: none;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Fortune Wheel Fun</h1>
+    <div id="wheel">
+        <canvas id="wheelCanvas"></canvas>
+        <div id="pointer"></div>
+        <div id="indicator">Winning segment: </div>
+    </div>
+    <div id="personImage"></div>
+    <button id="spinButton" onclick="spin()">Spin the Wheel</button>
+
+    <!-- Popup for winning segment details -->
+    <div id="overlay"></div>
+    <div id="popup">
+        <h2 id="popupTitle"></h2>
+        <div class="audio-container">
+            <img id="popupImage" src="" alt="Segment Image">
+            <button id="playButton" onclick="playAudio()">&#9658;</button>
+        </div>
+        <p id="popupDescription"></p>
+        <audio id="popupAudio" src=""></audio>
+        <a class="close" href="javascript:void(0);" onclick="closePopup()">Close</a>
+    </div>
+
+    <!-- JSON data embedded in the HTML -->
+    <script id="segmentData" type="application/json">
+    [
+        {
+            "name": "Segment 1",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio1.mp3",
+            "description": "This is the description for segment 1.",
+            "pdf": "https://example.com/document1.pdf"
+        },
+        {
+            "name": "Segment 2",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio2.mp3",
+            "description": "This is the description for segment 2.",
+            "pdf": "https://example.com/document2.pdf"
+        },
+        {
+            "name": "Segment 3",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio3.mp3",
+            "description": "This is the description for segment 3.",
+            "pdf": "https://example.com/document3.pdf"
+        },
+        {
+            "name": "Segment 4",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio4.mp3",
+            "description": "This is the description for segment 4.",
+            "pdf": "https://example.com/document4.pdf"
+        },
+        {
+            "name": "Segment 5",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio5.mp3",
+            "description": "This is the description for segment 5.",
+            "pdf": "https://example.com/document5.pdf"
+        },
+        {
+            "name": "Segment 6",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio6.mp3",
+            "description": "This is the description for segment 6.",
+            "pdf": "https://example.com/document6.pdf"
+        },
+        {
+            "name": "Segment 7",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio7.mp3",
+            "description": "This is the description for segment 7.",
+            "pdf": "https://example.com/document7.pdf"
+        },
+        {
+            "name": "Segment 8",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio8.mp3",
+            "description": "This is the description for segment 8.",
+            "pdf": "https://example.com/document8.pdf"
+        },
+        {
+            "name": "Segment 9",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio7.mp3",
+            "description": "This is the description for segment 7.",
+            "pdf": "https://example.com/document7.pdf"
+        },
+        {
+            "name": "Segment 10",
+            "image": "https://via.placeholder.com/300",
+            "audio": "https://example.com/audio8.mp3",
+            "description": "This is the description for segment 8.",
+            "pdf": "https://example.com/document8.pdf"
+        }
+    ]
+    </script>
+
+    <script>
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        let segments = [];
+
+        // Parse segments data from embedded JSON
+        const segmentDataElement = document.getElementById('segmentData');
+        segments = JSON.parse(segmentDataElement.textContent);
+        drawWheel();
+
+        function drawWheel() {
+            const segmentAngle = (2 * Math.PI) / segments.length;
+            canvas.width = 500;
+            canvas.height = 500;
+
+            // Draw segments and names
+            segments.forEach((segment, i) => {
+                ctx.beginPath();
+                ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 250, i * segmentAngle, (i + 1) * segmentAngle);
+                ctx.closePath();
+                ctx.fillStyle = getColor(i);
+                ctx.fill();
+
+                // Draw names
+                ctx.save();
+                ctx.translate(250, 250);
+                ctx.rotate((i + 0.5) * segmentAngle);
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = '#000';
+                ctx.fillText(segment.name, 150, 10);
+                ctx.restore();
+            });
+        }
+
+        function spin() {
+            const wheel = document.querySelector('#wheelCanvas');
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = true; // Disable the button to prevent multiple spins
+
+            const spinDegrees = Math.floor(Math.random() * 360) + 7200; // Ensures at least 20 full spins
+            wheel.style.transition = 'transform 2s ease-out'; // 2 seconds for the spin to complete
+            wheel.style.transform = `rotate(${spinDegrees}deg)`;
+
+            // Calculate the result
+            setTimeout(() => {
+                const actualDegrees = spinDegrees % 360;
+                const normalizedDegrees = (360 - actualDegrees + (360 / segments.length) / 2) % 360; // Ensure 0 is at the top
+                const segment = Math.floor(normalizedDegrees / (360 / segments.length)); // Calculate winning segment
+                const winningSegment = segments[segment];
+                showPopup(winningSegment);
+
+                // Reset the wheel position for next spin
+                wheel.style.transition = 'none';
+                wheel.style.transform = `rotate(${actualDegrees}deg)`;
+
+                spinButton.disabled = false; // Re-enable the button
+            }, 2000); // 2 seconds for the spin to complete
+        }
+
+        function getColor(index) {
+            const colours = ['#EFA92E', '#5B807D', '#EAA131', '#5B807D', '#739C37', '#C45A29', '#EAA131', '#5B807D', '#EAA131', '#B15E70', '#5B807D', '#EFA92E', '#5B807D', '#EAA131', '#5B807D', '#739C37', '#C45A29', '#EAA131', '#5B807D', '#EAA131', '#B15E70', '#5B807D'];
+            return colours[index];
+        }
+
+        function showPopup(segment) {
+            document.getElementById('popupTitle').innerText = segment.name;
+            document.getElementById('popupImage').src = segment.image;
+            document.getElementById('popupDescription').innerText = segment.description;
+            document.getElementById('popupAudio').src = segment.audio;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        function playAudio() {
+            const audio = document.getElementById('popupAudio');
+            audio.play();
+        }
+    </script>
+</body>
+
+</html>
