@@ -111,11 +111,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 520px;
+            padding-left: 50px;
+            padding-right: 50px;
+            background: #EFEFEF;
+            box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
             z-index: 1000;
+            border-radius: 12px;
         }
 
         #popup h2 {
@@ -124,21 +126,28 @@
             color: #FFD700;
         }
 
+        #popup audio {
+            width: 520px;
+            padding-top: 24px;
+            padding-bottom: 24px;
+        }
+
         #popup img {
             width: 100%;
             height: auto;
-            border-radius: 10px;
-        }
-
-        #popup button {
-            background: rgba(255, 215, 0, 0.8);
-            border: none;
-            border-radius: 50%;
-            padding: 10px;
-            cursor: pointer;
+            background: #FFF;
+            box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
         }
 
         #popup #openDocumentButton {
+            position: absolute;
+            bottom: 20px;
+            left: 164px;
+            right: 164px;
+            margin-left: auto;
+            margin-right: auto;
+            z-index: 2;
+
             display: inline-flex;
             padding: 12px 24px;
             justify-content: center;
@@ -149,11 +158,25 @@
             background: #FF002E;
             color: #FFF;
 
+            color: #FFF;
+
             font-family: "Noto Sans";
             font-size: 15px;
             font-style: normal;
             font-weight: 700;
             line-height: normal;
+            text-decoration: none;
+        }
+
+        #imageScrim {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 170px;
+            background: linear-gradient(179deg, rgba(239, 239, 239, 0.00) 1.02%, #EFEFEF 98.93%);
+            z-index: 1;
+            border-radius: 12px;
         }
 
         #popup .close {
@@ -171,7 +194,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 999;
         }
     </style>
@@ -191,9 +214,9 @@
     <div id="overlay"></div>
     <div id="popup">
         <a class="close" href="javascript:void(0);" onclick="closePopup()">Close</a>
-        <button id="playButton" onclick="playAudio()">&#9658;</button>
-        <audio id="popupAudio" src=""></audio>
+        <audio id="popupAudio" src="" controls></audio>
         <img id="popupImage" src="" alt="Segment Image">
+        <div id="imageScrim"></div>
         <a id="openDocumentButton" target=”_blank”>View Document</a>
     </div>
 
@@ -329,16 +352,26 @@
             document.getElementById('openDocumentButton').href = segment.pdf;
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('popup').style.display = 'block';
+            playAudio();
         }
 
         function closePopup() {
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('popup').style.display = 'none';
+            const audio = document.getElementById('popupAudio');
+            if (!audio.paused) {
+                stopAudio();
+            }
         }
 
         function playAudio() {
             const audio = document.getElementById('popupAudio');
             audio.play();
+        }
+        function stopAudio() {
+            const audio = document.getElementById('popupAudio');
+            audio.pause();
+            audio.currentTime = 0;
         }
     </script>
 </body>
