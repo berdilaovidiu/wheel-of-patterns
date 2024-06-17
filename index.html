@@ -130,20 +130,30 @@
             border-radius: 10px;
         }
 
-        #popup .audio-container {
-            position: relative;
-        }
-
-        #popup .audio-container button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        #popup button {
             background: rgba(255, 215, 0, 0.8);
             border: none;
             border-radius: 50%;
             padding: 10px;
             cursor: pointer;
+        }
+
+        #popup #openDocumentButton {
+            display: inline-flex;
+            padding: 12px 24px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+
+            border-radius: 100px;
+            background: #FF002E;
+            color: #FFF;
+
+            font-family: "Noto Sans";
+            font-size: 15px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: normal;
         }
 
         #popup .close {
@@ -180,14 +190,11 @@
     <!-- Popup for winning segment details -->
     <div id="overlay"></div>
     <div id="popup">
-        <h2 id="popupTitle"></h2>
-        <div class="audio-container">
-            <img id="popupImage" src="" alt="Segment Image">
-            <button id="playButton" onclick="playAudio()">&#9658;</button>
-        </div>
-        <p id="popupDescription"></p>
-        <audio id="popupAudio" src=""></audio>
         <a class="close" href="javascript:void(0);" onclick="closePopup()">Close</a>
+        <button id="playButton" onclick="playAudio()">&#9658;</button>
+        <audio id="popupAudio" src=""></audio>
+        <img id="popupImage" src="" alt="Segment Image">
+        <a id="openDocumentButton" target=”_blank”>View Document</a>
     </div>
 
     <!-- JSON data embedded in the HTML -->
@@ -195,55 +202,55 @@
     [
         {
             "name": "The Icebreaker",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "The Prompt Genie",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "Multimodal Prompts",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "In-Context Reactions",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "The Option Picker",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "The Introducer",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "The AI Overview",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "Intent-based Conversations",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         },
         {
             "name": "Slot Filling",
-            "image": "resources/Feedback - In Context Feedback/Feedback - In Context Feedback.png",
+            "image": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.png",
             "audio": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker.mp3",
             "pdf": "resources/Prompting - The Icebreaker/Prompting - The Icebreaker - long.pdf"
         }
@@ -317,10 +324,9 @@
         }
 
         function showPopup(segment) {
-            document.getElementById('popupTitle').innerText = segment.name;
             document.getElementById('popupImage').src = segment.image;
-            document.getElementById('popupDescription').innerText = segment.description;
             document.getElementById('popupAudio').src = segment.audio;
+            document.getElementById('openDocumentButton').href = segment.pdf;
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('popup').style.display = 'block';
         }
