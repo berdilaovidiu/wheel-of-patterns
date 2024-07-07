@@ -8,14 +8,16 @@
 
     <!-- Basic meta tags -->
     <meta name="title" content="AI Interactions Wheel of Laughs">
-    <meta name="description" content="Discover AI interaction patterns with a twist! Explore our AI-crafted, Seinfeld-themed Wheel of Fortune game and laugh while you learn. Spin the wheel, get insights, and enjoy the fun!">
+    <meta name="description"
+        content="Discover AI interaction patterns with a twist! Explore our AI-crafted, Seinfeld-themed Wheel of Fortune game and laugh while you learn. Spin the wheel, get insights, and enjoy the fun!">
 
     <!-- Open Graph data -->
     <meta property="og:title" content="AI Interactions Wheel of Laughs" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://berdilaovidiu.github.io/wheel-of-patterns/" />
     <meta property="og:image" content="https://cdn.midjourney.com/b65b679c-a2e3-40ca-809c-d4f281ee6479/0_0.png" />
-    <meta property="og:description" content="Discover AI interaction patterns with a twist! Explore our AI-crafted, Seinfeld-themed Wheel of Fortune game and laugh while you learn. Spin the wheel, get insights, and enjoy the fun!" />
+    <meta property="og:description"
+        content="Discover AI interaction patterns with a twist! Explore our AI-crafted, Seinfeld-themed Wheel of Fortune game and laugh while you learn. Spin the wheel, get insights, and enjoy the fun!" />
     <meta property="og:site_name" content="AI Interactions Wheel of Laughs" />
 
     <style>
@@ -54,12 +56,12 @@
         #pointer {
             width: 0;
             height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 30px solid red;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-top: 60px solid #682811;
             position: absolute;
-            top: -40px;
-            left: calc(50% - 20px);
+            top: -30px;
+            left: calc(50% - 40px);
         }
 
         #indicator {
@@ -102,6 +104,7 @@
             background-position: center;
             text-align: center;
             z-index: 1;
+            pointer-events: none;
         }
 
         /* Popup styling */
@@ -323,7 +326,7 @@
             segments.forEach((segment, i) => {
                 ctx.beginPath();
                 ctx.moveTo(250, 250);
-                ctx.arc(250, 250, 250, i * segmentAngle, (i + 1) * segmentAngle);
+                ctx.arc(250, 250, 250, i * segmentAngle - Math.PI / 2, (i + 1) * segmentAngle - Math.PI / 2);
                 ctx.closePath();
                 ctx.fillStyle = getColor(i);
                 ctx.fill();
@@ -331,7 +334,7 @@
                 // Draw names
                 ctx.save();
                 ctx.translate(250, 250);
-                ctx.rotate((i + 0.5) * segmentAngle);
+                ctx.rotate((i + 0.5) * segmentAngle - Math.PI / 2);
                 ctx.textAlign = 'center';
                 ctx.font = 'bold 16px Arial';
                 ctx.fillStyle = '#000';
@@ -340,29 +343,46 @@
             });
         }
 
+        canvas.addEventListener('click', function (event) {
+            var x = event.clientX - canvas.getBoundingClientRect().left;
+            var y = event.clientY - canvas.getBoundingClientRect().top;
+
+            const segmentAngle = (2 * Math.PI) / segments.length;
+            segments.forEach((segment, i) => {
+                ctx.beginPath();
+                ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 250, i * segmentAngle - Math.PI / 2, (i + 1) * segmentAngle - Math.PI / 2);
+                ctx.closePath();
+
+                if (ctx.isPointInPath(x, y)) {
+                    showPopup(segment);
+                }
+            });
+        });
+
         function spin() {
             const wheel = document.querySelector('#wheelCanvas');
             const spinButton = document.getElementById('spinButton');
             spinButton.disabled = true; // Disable the button to prevent multiple spins
 
-            const spinDegrees = Math.floor(Math.random() * 360) + 7200; // Ensures at least 20 full spins
-            wheel.style.transition = 'transform 2s ease-out'; // 2 seconds for the spin to complete
+            const fullSpins = Math.floor(Math.random() * 5); // Random number of full spins
+            const spinDegrees = Math.floor(Math.random() * 360) + fullSpins * 360; // Random number of full spins
+            wheel.style.transition = `transform ${fullSpins}s ease-out`; // 2 seconds for the spin to complete
             wheel.style.transform = `rotate(${spinDegrees}deg)`;
 
             // Calculate the result
             setTimeout(() => {
                 const actualDegrees = spinDegrees % 360;
-                const normalizedDegrees = (360 - actualDegrees + (360 / segments.length) / 2) % 360; // Ensure 0 is at the top
-                const segment = Math.floor(normalizedDegrees / (360 / segments.length)); // Calculate winning segment
-                const winningSegment = segments[segment];
+                const segment = Math.floor(actualDegrees / (360 / segments.length)); // Calculate winning segment
+                const winningSegment = segments[segments.length - segment - 1];
                 showPopup(winningSegment);
 
                 // Reset the wheel position for next spin
                 wheel.style.transition = 'none';
-                wheel.style.transform = `rotate(${actualDegrees}deg)`;
+                wheel.style.transform = `rotate(0deg)`;
 
                 spinButton.disabled = false; // Re-enable the button
-            }, 2000); // 2 seconds for the spin to complete
+            }, fullSpins * 1000); // 2 seconds for the spin to complete
         }
 
         function getColor(index) {
